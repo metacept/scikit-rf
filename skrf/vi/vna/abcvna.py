@@ -103,13 +103,21 @@ class VNA(object):
         self.resource.read_termination = "\n"  # most queries are terminated with a newline
         self.resource.write_termination = "\n"
         if "instr" in resource_string.lower():
-            self.resource.control_ren(2)
+            try:
+                self.resource.control_ren(2)
+            except pyvisa.errors.VisaIOError:
+                print("Warning: Failed to explicitly exert remote control.")
 
         # convenience pyvisa functions
         self.write = self.resource.write
+        self.write_ascii_values = self.resource.write_ascii_values
+        self.write_binary_values = self.resource.write_binary_values
         self.read = self.resource.read
+        self.read_ascii_values = self.resource.read_ascii_values
+        self.read_binary_values = self.resource.read_binary_values
         self.query = self.resource.query
-        self.query_values = self.resource.query_values
+        self.query_ascii_values = self.resource.query_ascii_values
+        self.query_binary_values = self.resource.query_binary_values
 
     def __enter__(self):
         """
