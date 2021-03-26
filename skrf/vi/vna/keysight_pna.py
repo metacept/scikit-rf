@@ -364,7 +364,7 @@ class PNA(abcvna.VNA):
         channel = kwargs.get("channel", self.active_channel)
         sweep_type = self.scpi.query_sweep_type(channel)
         if sweep_type in ["LIN", "LOG", "SEGM"]:
-            freqs = self.scpi.query_sweep_data(channel)
+            freqs = self.scpi.query_sweep_data_ascii(channel)
         else:
             freqs = np.array([self.scpi.query_f_start(channel)])
 
@@ -380,7 +380,7 @@ class PNA(abcvna.VNA):
         channel = kwargs.get("channel", self.active_channel)
         self.scpi.set_f_start(channel, f_start)
         self.scpi.set_f_stop(channel, f_stop)
-        self.scpi.set_sweep_n_points(f_npoints)
+        self.scpi.set_sweep_n_points(cnum = channel, n_points = f_npoints)
 
     def get_switch_terms(self, ports=(1, 2), **kwargs):
         self.resource.clear()
@@ -462,7 +462,7 @@ class PNA(abcvna.VNA):
             self.sweep(channel=channel)
 
         ntwk = skrf.Network()
-        sdata = self.scpi.query_data(channel)
+        sdata = np.asarray(self.scpi.query_data_ascii(cnum=channel))
         ntwk.s = sdata[::2] + 1j * sdata[1::2]
         ntwk.frequency = self.get_frequency(channel=channel)
         return ntwk
