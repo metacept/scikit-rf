@@ -113,7 +113,6 @@ class SCPI(object):
         scpi_command = scpi_preprocess(":SENS{:}:CORR:CSET:DATA {:},{:},{:},{:},", cnum, eterm, portA, portB, param)
         self.write_binary_values(scpi_command, eterm_data)
     
-
     def set_calset_description(self, cnum=1, description=""):
         """no help available"""
         scpi_command = scpi_preprocess(":SENS{:}:CORR:CSET:DESC '{:}'", cnum, description)
@@ -170,6 +169,21 @@ class SCPI(object):
         """no help available"""
         scpi_command = scpi_preprocess(":CALC{:}:PAR:DEL '{:}'", cnum, mname)
         self.write(scpi_command)
+
+    def set_delete_trace(self, wnum =1, tnum=1):
+        """no help available"""
+        scpi_command = scpi_preprocess(":DISP:WIND{:}:TRAC{:}:DEL", wnum, tnum)
+        self.write(scpi_command)
+
+    def set_delete_all(self):
+        """no help available"""
+        scpi_command = scpi_preprocess(":CALC:PAR:DEL:ALL")
+        self.write(scpi_command)
+        
+    def set_display_on(self, wnum=1, state=True):
+        """no help available"""
+        scpi_command = scpi_preprocess(":DISP:WIND{:}:STAT {:}", wnum, int(state))
+        self.write(scpi_command)        
 
     def set_display_format(self, cnum=1, fmt="MLOG"):
         """no help available"""
@@ -245,7 +259,12 @@ class SCPI(object):
         """no help available"""
         scpi_command = scpi_preprocess(":TRIG:SOUR {:}", trigger_source)
         self.write(scpi_command)
-
+        
+    def set_trigger_manual(self):
+        """no help available"""
+        scpi_command = scpi_preprocess( ":INIT:CONT {:}", int(False))
+        self.write(scpi_command)
+        
     def query_active_calset(self, cnum=1, form="NAME"):
         """no help available"""
         scpi_command = scpi_preprocess(":SENS{:}:CORR:CSET:ACT? {:}", cnum, form)
@@ -305,7 +324,6 @@ class SCPI(object):
         scpi_command = scpi_preprocess(":SENS{:}:CORR:CSET:DATA? {:},{:},{:}", cnum, eterm, portA, portB)
         return self.query_binary_values(scpi_command)
     
-
     def query_calset_description(self, cnum=1):
         """no help available"""
         scpi_command = scpi_preprocess(":SENS{:}:CORR:CSET:DESC?", cnum)

@@ -380,7 +380,7 @@ class PNA(abcvna.VNA):
         channel = kwargs.get("channel", self.active_channel)
         self.scpi.set_f_start(channel, f_start)
         self.scpi.set_f_stop(channel, f_stop)
-        self.scpi.set_sweep_n_points(cnum = channel, n_points = f_npoints)
+        self.scpi.set_sweep_n_points(channel, f_npoints)
 
     def get_switch_terms(self, ports=(1, 2), **kwargs):
         self.resource.clear()
@@ -482,7 +482,7 @@ class PNA(abcvna.VNA):
         """
         channel = kwargs.get("channel", self.active_channel)
         self.scpi.set_create_meas(channel, mname, param)
-        self.display_trace(mname)
+        self.display_trace(mname, **kwargs)
 
     def display_trace(self, mname, **kwargs):
         """
