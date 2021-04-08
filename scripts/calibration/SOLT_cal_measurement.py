@@ -18,7 +18,7 @@ rf.stylely()
 #%% build folder for cal data using today's date
 today = date.today()
 date_str = today.strftime("%Y-%m-%d")
-cal_folder_name = 'Cal_eight_Term_test'+date_str
+cal_folder_name = date_str + '_SOLT'
 
 root_folder = Path('/Users/Zaber/Documents/data/scikit_measurements/')
 meas_folder = root_folder / cal_folder_name
@@ -68,6 +68,30 @@ rf.write(str(filename), measurement)
 measurement.frequency.units = 'ghz'
 measurement.plot_s_mag(ax = ax1, label ='Short S11')
 
+#%%OPEN S11 measurement 
+
+vna.sweep
+measurement = vna.get_measurement(mname = meas_S11)
+print(f'{meas_S11} measured')
+
+filename = meas_folder / ('OPEN_' + meas_S11 + '.ntwk')
+rf.write(str(filename), measurement)
+
+measurement.frequency.units = 'ghz'
+measurement.plot_s_mag(ax = ax1, label ='Open S11')
+
+#%%LOAD S11 measurement 
+
+vna.sweep
+measurement = vna.get_measurement(mname = meas_S11)
+print(f'{meas_S11} measured')
+
+filename = meas_folder / ('LOAD_' + meas_S11 + '.ntwk')
+rf.write(str(filename), measurement)
+
+measurement.frequency.units = 'ghz'
+measurement.plot_s_mag(ax = ax1, label ='Load S11')
+
 #%% SHORT S22 measurement 
 
 vna.sweep
@@ -80,17 +104,6 @@ rf.write(str(filename), measurement)
 measurement.frequency.units = 'ghz'
 measurement.plot_s_mag(ax = ax2, label ='Short S22')
 
-#%%OPEN S11 measurement 
-
-vna.sweep
-measurement = vna.get_measurement(mname = meas_S11)
-print(f'{meas_S11} measured')
-
-filename = meas_folder / ('OPEN_' + meas_S11 + '.ntwk')
-rf.write(str(filename), measurement)
-
-measurement.frequency.units = 'ghz'
-measurement.plot_s_mag(ax = ax1, label ='Open S11')
 #%%OPEN S22 measurement 
 
 vna.sweep
@@ -102,17 +115,6 @@ rf.write(str(filename), measurement)
 
 measurement.frequency.units = 'ghz'
 measurement.plot_s_mag(ax = ax2, label ='Open S22')
-#%%LOAD S11 measurement 
-
-vna.sweep
-measurement = vna.get_measurement(mname = meas_S11)
-print(f'{meas_S11} measured')
-
-filename = meas_folder / ('LOAD_' + meas_S11 + '.ntwk')
-rf.write(str(filename), measurement)
-
-measurement.frequency.units = 'ghz'
-measurement.plot_s_mag(ax = ax1, label ='Load S11')
 #%%Load S22 measurement 
 
 vna.sweep
@@ -141,7 +143,7 @@ print(f'{meas_S22} measured')
 filename = meas_folder / ('THRU_' + meas_S22 + '.ntwk')
 rf.write(str(filename), measurement)
 measurement.frequency.units = 'ghz'
-measurement.plot_s_mag(ax = ax1, label ='THRU S22')
+measurement.plot_s_mag(ax = ax2, label ='THRU S22')
 
 #THRU S21
 measurement = vna.get_measurement(mname = meas_S21)

@@ -56,7 +56,7 @@ ax.set_title('Thru measurement')
 #%% Ideal Open
 
 base_open = base_match
-base_open.s = 2*np.ones(base_match.f.shape)
+base_open.s = 1*np.ones(base_match.f.shape)
 OPEN_S11_85521A = base_open.delay(31.832, unit = 'ps') 
 OPEN_S22_85521A = OPEN_S11_85521A 
 
@@ -72,7 +72,7 @@ OPEN_85521A.plot_s_im(axis =ax, linestyle='--', linewidth= 2)
 #%% Ideal Short
 
 base_short = base_match
-base_short.s = -2*np.ones(base_match.f.shape)
+base_short.s = -1*np.ones(base_match.f.shape)
 SHORT_S11_85521A = base_short.delay(30.581, unit = 'ps')
 SHORT_S22_85521A = SHORT_S11_85521A
 
@@ -103,10 +103,11 @@ my_ideals = [\
     
 #%% Measured response from Mechanical Cal (85521A)
 
-cal_folder_name = 'eight_term_2021-04-02'
-
 measurement_root_folder = Path('/Users/Zaber/Documents/data/scikit_measurements/')
+cal_folder_name = 'SOLT2021-04-08'
+
 meas_folder = measurement_root_folder / cal_folder_name
+
 
 SHORT_S11 = np.load(meas_folder / 'SHORT_S11.ntwk', allow_pickle = True)
 SHORT_S22 = np.load(meas_folder / 'SHORT_S22.ntwk', allow_pickle = True)
@@ -166,6 +167,9 @@ dut_caled.name =  dut.name + 'corrected'
 
 # plot results
 dut_caled.frequency.unit = 'ghz'
+
+%matplotlib qt5
+fig1, ax =plt.subplots()
 dut_caled.plot_s_deg()
 # save results
 dut_caled.write_touchstone()
