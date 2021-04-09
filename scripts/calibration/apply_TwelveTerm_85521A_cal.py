@@ -32,64 +32,60 @@ plt.rcParams['axes.prop_cycle'] = cycler(color=['b', 'r', 'g', 'y'])
 ###########################################################################
 ##Ideal Thru
 
+freq = rf.Frequency(8,12, n_freq, 'ghz')
 
-base_match = rf.Network()
-base_match.frequency = rf.Frequency(8,12, n_freq, 'ghz')
+base_ntwk = rf.Freespace(freq, z0=50 +0j)
 
-base_match.s = pad_zeros
-base_match.s[:,0,1] = 1*np.ones(base_match.f.shape)
-base_match.s[:,1,0] = 1*np.ones(base_match.f.shape)
-
-THRU_85521A=base_match.delay(115.881, unit = 'ps')
+THRU_85521A = base_ntwk.line(115.881,unit ='ps')
+THRU_85521A.z0 = (50+0j)*np.ones((n_freq, 4)) 
 
 fig, ax = plt.subplots()
 THRU_85521A.plot_s_re(axis =ax, linewidth= 2)
 THRU_85521A.plot_s_im(axis =ax, linestyle='--', linewidth= 2)
-ax.set_title('Thru measurement')
-
-# THRU_S21_85521A=base_match.delay(115.881, unit = 'ps')
-# THRU_S12_85521A=base_match.delay(115.881, unit = 'ps')
-
-# THRU_S21_85521A.plot_s_re(axis = ax)
-# THRU_S12_85521A.plot_s_re(axis = ax)
+ax.set_title('Idela THRU')
 
 #%% Ideal Open
 
-base_open = base_match
-base_open.s = 1*np.ones(base_match.f.shape)
-OPEN_S11_85521A = base_open.delay(31.832, unit = 'ps') 
+OPEN_S11_85521A = base_ntwk.delay_load(1,31.832, unit = 'ps')
 OPEN_S22_85521A = OPEN_S11_85521A 
 
-
-# OPEN_S11_85521A.plot_s_re(axis = ax)
-# OPEN_S22_85521A.plot_s_re(axis = ax)
-
 OPEN_85521A = rf.two_port_reflect(OPEN_S11_85521A, OPEN_S22_85521A)
+OPEN_85521A.z0 =  (50+0j)*np.ones((n_freq, 4)) 
 
 fig, ax = plt.subplots()
 OPEN_85521A.plot_s_re(axis =ax, linewidth= 2)
 OPEN_85521A.plot_s_im(axis =ax, linestyle='--', linewidth= 2)
+
+ax.set_title('Ideal OPEN')
+
 #%% Ideal Short
 
-base_short = base_match
-base_short.s = -1*np.ones(base_match.f.shape)
-SHORT_S11_85521A = base_short.delay(30.581, unit = 'ps')
+SHORT_S11_85521A = base_ntwk.delay_load(-1, 30.581, unit = 'ps')
+
+
 SHORT_S22_85521A = SHORT_S11_85521A
 
 SHORT_85521A = rf.two_port_reflect(SHORT_S11_85521A,SHORT_S22_85521A)
+SHORT_85521A.z0 =  (50+0j)*np.ones((n_freq, 4)) 
 
 fig, ax = plt.subplots()
 SHORT_85521A.plot_s_re(axis =ax, linewidth= 2)
 SHORT_85521A.plot_s_im(axis =ax, linestyle='--', linewidth= 2)
-# SHORT_S11_85521A.plot_s_re(axis = ax)
-# SHORT_S22_85521A.plot_s_re(axis = ax)
+
+ax.set_title('Ideal SHORT')
+
 #%% Ideal Load
-LOAD_85521A = base_match
-LOAD_85521A.s = pad_zeros
+LOAD_S11_85521A = base_ntwk.delay_load(0,0)
+
+LOAD_85521A = rf.two_port_reflect(LOAD_S11_85521A)
+LOAD_85521A.z0 = (50+0j)*np.ones((n_freq, 4)) 
 
 fig, ax = plt.subplots()
 LOAD_85521A.plot_s_re(axis =ax, linewidth= 2)
 LOAD_85521A.plot_s_im(axis =ax, linestyle='--', linewidth= 2)
+
+ax.set_title('Ideal LOAD')
+
 #%%
 
 
@@ -124,12 +120,19 @@ THRU_S12 = np.load(meas_folder / 'THRU_S12.ntwk', allow_pickle = True)
 
 
 SHORT = rf.two_port_reflect(SHORT_S11,SHORT_S22)
+SHORT.z0  = (50+0j)*np.ones((n_freq, 4)) 
+
 OPEN = rf.two_port_reflect(OPEN_S11,OPEN_S22)
+OPEN.z0  = (50+0j)*np.ones((n_freq, 4)) 
+ 
 LOAD = rf.two_port_reflect(LOAD_S11,LOAD_S22)
+LOAD.z0  = (50+0j)*np.ones((n_freq, 4)) 
 
 THRU = rf.two_port_reflect(THRU_S11, THRU_S22)
 THRU.s[:,0,1] = THRU_S12.s[:,0,0]
 THRU.s[:,1,0] = THRU_S21.s[:,0,0]
+
+THRU.z0  = (50+0j)*np.ones((n_freq, 4)) 
 
 # my_measured_ntwk = [\
 #         rf.Network(SHORT_S11.as_posix()),
@@ -151,7 +154,7 @@ my_measured = [\
     
 
 ## create a Calibration instance
-cal = rf.SOLT(\
+cal = rf.TwelveTerm(\
         ideals = my_ideals,
         measured = my_measured,
         )
@@ -168,8 +171,8 @@ dut_caled.name =  dut.name + 'corrected'
 # plot results
 dut_caled.frequency.unit = 'ghz'
 
-%matplotlib qt5
-fig1, ax =plt.subplots()
+# %matplotlib qt5
+# fig1, ax =plt.subplots()
 dut_caled.plot_s_deg()
 # save results
 dut_caled.write_touchstone()

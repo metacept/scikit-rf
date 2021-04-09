@@ -68,17 +68,14 @@ measurement.s[:,0,1] = measurement_S12.s[:,0,0]
 measurement.s[:,1,0] = measurement_S21.s[:,0,0]
 
 #%%
-
-
 measurement_corrected = cal.apply_cal(measurement)
 
-
 #%% plot
-%matplotlib qt5
+# %matplotlib qt5
 
 fig, (ax1, ax2)  = plt.subplots(2,1)
-measurement.plot_s_db(ax = ax1)
-measurement_corrected.plot_s_db(ax = ax2)
+measurement.plot_s_deg(ax = ax1)
+measurement_corrected.plot_s_deg(ax = ax2)
 
 
 #%% build folder for cal data using today's date
