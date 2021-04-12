@@ -40,7 +40,6 @@ vna.scpi.set_trigger_manual
 
 meas_channel = 2
 
-fig, (ax1, ax2)  = plt.subplots(2,1)
 
 meas_S11 = 'S11'
 vna.create_meas(meas_S11,'S11', channel = meas_channel) 
@@ -57,7 +56,10 @@ vna.set_frequency_sweep(f_start,
                         f_unit = 'Hz',
                         channel = meas_channel, 
                         )
+
+# %matplotlib qt5
 #%%THRU measurement 
+fig, (ax1, ax2)  = plt.subplots(2,1)
 
 vna.sweep
 #THRU S11
@@ -66,7 +68,7 @@ print(f'{meas_S11} measured')
 filename = meas_folder / ('THRU_' + meas_S11 + '.ntwk')
 rf.write(str(filename), measurement)
 measurement.frequency.units = 'ghz'
-measurement.plot_s_mag(ax = ax1, label ='THRU S11')
+measurement.plot_s_db(ax = ax1, label ='THRU S11')
 
 #THRU S22
 measurement = vna.get_measurement(mname = meas_S22)
@@ -74,7 +76,7 @@ print(f'{meas_S22} measured')
 filename = meas_folder / ('THRU_' + meas_S22 + '.ntwk')
 rf.write(str(filename), measurement)
 measurement.frequency.units = 'ghz'
-measurement.plot_s_mag(ax = ax1, label ='THRU S22')
+measurement.plot_s_db(ax = ax2, label ='THRU S22')
 
 #THRU S21
 measurement = vna.get_measurement(mname = meas_S21)
@@ -82,7 +84,7 @@ print(f'{meas_S21} measured')
 filename = meas_folder / ('THRU_' + meas_S21 + '.ntwk')
 rf.write(str(filename), measurement)
 measurement.frequency.units = 'ghz'
-measurement.plot_s_mag(ax = ax1, label ='THRU S21')
+measurement.plot_s_db(ax = ax1, label ='THRU S21')
 
 #THRU S12
 measurement = vna.get_measurement(mname = meas_S12)
@@ -91,26 +93,18 @@ print(f'{meas_S12} measured')
 filename = meas_folder / ('THRU_' + meas_S12 + '.ntwk')
 rf.write(str(filename), measurement)
 measurement.frequency.units = 'ghz'
-measurement.plot_s_mag(ax = ax2, label ='THRU S12')
+measurement.plot_s_db(ax = ax2, label ='THRU S12')
 
 #%%REFLECT measurement 
-
 vna.sweep
+
 #REFLECT S11
 measurement = vna.get_measurement(mname = meas_S11)
 print(f'{meas_S11} measured')
 filename = meas_folder / ('REFLECT_' + meas_S11 + '.ntwk')
 rf.write(str(filename), measurement)
 measurement.frequency.units = 'ghz'
-measurement.plot_s_mag(ax = ax1, label ='THRU S11')
-
-#REFLECT S22
-measurement = vna.get_measurement(mname = meas_S22)
-print(f'{meas_S22} measured')
-filename = meas_folder / ('REFLECT_' + meas_S22 + '.ntwk')
-rf.write(str(filename), measurement)
-measurement.frequency.units = 'ghz'
-measurement.plot_s_mag(ax = ax1, label ='THRU S22')
+measurement.plot_s_db(ax = ax1, label ='REFLECT S11')
 
 #REFLECT S21
 measurement = vna.get_measurement(mname = meas_S21)
@@ -118,7 +112,18 @@ print(f'{meas_S21} measured')
 filename = meas_folder / ('REFLECT_' + meas_S21 + '.ntwk')
 rf.write(str(filename), measurement)
 measurement.frequency.units = 'ghz'
-measurement.plot_s_mag(ax = ax1, label ='THRU S21')
+measurement.plot_s_db(ax = ax1, label ='REFLECT S21')
+
+#%%
+vna.sweep
+
+#REFLECT S22
+measurement = vna.get_measurement(mname = meas_S22)
+print(f'{meas_S22} measured')
+filename = meas_folder / ('REFLECT_' + meas_S22 + '.ntwk')
+rf.write(str(filename), measurement)
+measurement.frequency.units = 'ghz'
+measurement.plot_s_db(ax = ax2, label ='REFLECT S22')
 
 #REFLECT S12
 measurement = vna.get_measurement(mname = meas_S12)
@@ -127,7 +132,7 @@ print(f'{meas_S12} measured')
 filename = meas_folder / ('REFLECT_' + meas_S12 + '.ntwk')
 rf.write(str(filename), measurement)
 measurement.frequency.units = 'ghz'
-measurement.plot_s_mag(ax = ax2, label ='THRU S12')
+measurement.plot_s_db(ax = ax2, label ='REFLECT S12')
 
 #%%LINE measurement 
 
@@ -138,15 +143,7 @@ print(f'{meas_S11} measured')
 filename = meas_folder / ('LINE_' + meas_S11 + '.ntwk')
 rf.write(str(filename), measurement)
 measurement.frequency.units = 'ghz'
-measurement.plot_s_mag(ax = ax1, label ='THRU S11')
-
-#LINE S22
-measurement = vna.get_measurement(mname = meas_S22)
-print(f'{meas_S22} measured')
-filename = meas_folder / ('LINE_' + meas_S22 + '.ntwk')
-rf.write(str(filename), measurement)
-measurement.frequency.units = 'ghz'
-measurement.plot_s_mag(ax = ax1, label ='THRU S22')
+measurement.plot_s_db(ax = ax1, label ='LINE S11')
 
 #THRU S21
 measurement = vna.get_measurement(mname = meas_S21)
@@ -154,7 +151,15 @@ print(f'{meas_S21} measured')
 filename = meas_folder / ('LINE_' + meas_S21 + '.ntwk')
 rf.write(str(filename), measurement)
 measurement.frequency.units = 'ghz'
-measurement.plot_s_mag(ax = ax1, label ='THRU S21')
+measurement.plot_s_db(ax = ax1, label ='LINE S21')
+
+#LINE S22
+measurement = vna.get_measurement(mname = meas_S22)
+print(f'{meas_S22} measured')
+filename = meas_folder / ('LINE_' + meas_S22 + '.ntwk')
+rf.write(str(filename), measurement)
+measurement.frequency.units = 'ghz'
+measurement.plot_s_db(ax = ax2, label ='LINE S22')
 
 #LINE S12
 measurement = vna.get_measurement(mname = meas_S12)
@@ -163,8 +168,11 @@ print(f'{meas_S12} measured')
 filename = meas_folder / ('LINE_' + meas_S12 + '.ntwk')
 rf.write(str(filename), measurement)
 measurement.frequency.units = 'ghz'
-measurement.plot_s_mag(ax = ax2, label ='THRU S12')
+measurement.plot_s_db(ax = ax2, label ='LINE S12')
 
 
-#%%
+#%%get switch term
+switch_terms = vna.get_switch_terms()
 
+filename = meas_folder / ('SWITCH_TERMS.ntwk')
+rf.write(str(filename), switch_terms)
