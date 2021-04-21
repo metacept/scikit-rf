@@ -30,7 +30,7 @@ plt.rcParams['axes.prop_cycle'] = cycler(color=['b', 'r', 'g', 'y'])
 
 #%% Measured response from TRL Cal 
 
-cal_folder_name = 'TRL2021-04-16'
+cal_folder_name = 'TRL2021-04-19'
 
 measurement_root_folder = Path('/Users/Zaber/Documents/data/scikit_measurements/')
 meas_folder = measurement_root_folder / cal_folder_name

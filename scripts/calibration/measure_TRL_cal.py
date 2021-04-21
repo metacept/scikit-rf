@@ -95,6 +95,12 @@ rf.write(str(filename), measurement)
 measurement.frequency.units = 'ghz'
 measurement.plot_s_db(ax = ax2, label ='THRU S12')
 
+#%%get switch term, should be measured with a low insertion loss (i.e. with thru measurement should work)
+switch_terms = vna.get_switch_terms()
+
+filename = meas_folder / ('SWITCH_TERMS.ntwk')
+rf.write(str(filename), switch_terms)
+
 #%%REFLECT measurement 
 vna.sweep
 
@@ -171,8 +177,4 @@ measurement.frequency.units = 'ghz'
 measurement.plot_s_db(ax = ax2, label ='LINE S12')
 
 
-#%%get switch term
-switch_terms = vna.get_switch_terms()
 
-filename = meas_folder / ('SWITCH_TERMS.ntwk')
-rf.write(str(filename), switch_terms)
