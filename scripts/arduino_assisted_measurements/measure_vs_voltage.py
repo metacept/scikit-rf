@@ -34,9 +34,9 @@ plt.rcParams['axes.prop_cycle'] = cycler(color=['b', 'r', 'g', 'y'])
 
 #%% Measured response from TRL Cal 
 
+measurement_root_folder = Path('/Users/Zaber/Documents/data/scikit_measurements/')
 cal_folder_name = 'TRL2021-04-21'
 
-measurement_root_folder = Path('/Users/Zaber/Documents/data/scikit_measurements/')
 meas_folder = measurement_root_folder / cal_folder_name
 
 THRU_S11 = np.load(meas_folder / 'THRU_S11.ntwk', allow_pickle = True)
@@ -98,10 +98,8 @@ trl = rf.TRL(\
 # run calibration algorithm
 trl.run()
 
-#%%
-# =============================================================================
-# Take new measurement to process cal on
-# =============================================================================
+#%% setup measurements
+
 
 f_start = THRU.f[0]
 f_stop = THRU.f[-1]
@@ -137,10 +135,7 @@ vna.set_frequency_sweep(f_start,
                         )
 
 
-
-#%%
-
-#%% arduino
+#%% set voltages with arduino and take measurements
 
 set_data_folder = Path('/Users/Zaber/Documents/data/scikit_measurements/channel3/')
 set_data_folder.mkdir(exist_ok = True)
@@ -149,9 +144,9 @@ fig, (ax1,ax2)= plt.subplots(2,1)
 port = 'COM4'
 Vref = 5 #volts
 
-voltage_index = list(range(0,256)) #0-255 states
-voltage_values =Vref*np.array(voltage_index)/255
-voltage_dict = dict(zip(voltage_index, voltage_values))
+voltage_settings = list(range(256)) #0-255 states
+voltage_values =Vref*np.array(voltage_settings)/255
+voltage_dict = dict(zip(voltage_settings, voltage_values))
 
 # set_voltage_indx = 100
 
@@ -167,9 +162,8 @@ with ExitStack() as cm:
     #set a
     n_dac=12
 
-
-    for voltage_indx in range(256):    
-        ts_temp=n_dac*[voltage_indx]
+    for v_indx in voltage_settings:    
+        ts_temp=n_dac*[voltage_settings]
         address =15
         msg = '15'
         for jj in range(n_dac):
@@ -183,7 +177,7 @@ with ExitStack() as cm:
             arduino.readline()
         arduino.write(msg.encode('utf-8'))
     
-        print(f'Voltage should be set to {voltage_dict[voltage_indx]}')
+        print(f'Voltage should be set to {voltage_dict[v_indx]}')
 
         vna.sweep
         # S11
@@ -230,7 +224,7 @@ with ExitStack() as cm:
 
 # apply it to a dut
 
-        dut_raw.name = 'voltage_indx_' + str(voltage_indx)
+        dut_raw.name = 'voltage_indx_' + str(v_indx)
         dut_corrected = trl.apply_cal(dut_raw)
         dut_corrected.name =  'trl_corrected_' + dut_raw.name
         
