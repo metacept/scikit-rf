@@ -29,7 +29,7 @@ meas_folder.mkdir(exist_ok = True)
 
 f_start = 8E9
 f_stop = 12E9
-f_npoints = int(101)
+f_npoints = int(251)
 
 vna = PNA(address ='TCPIP0::10.236.73.132::inst0::INSTR')
 vna.reset()

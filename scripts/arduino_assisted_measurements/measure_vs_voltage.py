@@ -35,7 +35,7 @@ plt.rcParams['axes.prop_cycle'] = cycler(color=['b', 'r', 'g', 'y'])
 #%% Measured response from TRL Cal 
 
 measurement_root_folder = Path('/Users/Zaber/Documents/data/scikit_measurements/')
-cal_folder_name = 'TRL2021-04-21'
+cal_folder_name = 'TRL2021-04-23'
 
 meas_folder = measurement_root_folder / cal_folder_name
 
@@ -137,7 +137,7 @@ vna.set_frequency_sweep(f_start,
 
 #%% set voltages with arduino and take measurements
 
-set_data_folder = Path('/Users/Zaber/Documents/data/scikit_measurements/channel3/')
+set_data_folder = Path('/Users/Zaber/Documents/data/scikit_measurements/channel4_251pts/')
 set_data_folder.mkdir(exist_ok = True)
 
 fig, (ax1,ax2)= plt.subplots(2,1)
@@ -163,12 +163,12 @@ with ExitStack() as cm:
     n_dac=12
 
     for v_indx in voltage_settings:    
-        ts_temp=n_dac*[voltage_settings]
+        ts_temp=n_dac*[v_indx]
         address =15
         msg = '15'
         for jj in range(n_dac):
          #   msg=msg + ' ' + str(address+16*ts_temp[jj])
-            msg=msg + ' ' + str(4096*address+16*ts_temp[jj])
+            msg=msg + ' ' + str(4096*address + 16*ts_temp[jj])
         msg=msg +' '
         
         byt = arduino.in_waiting;
@@ -255,51 +255,67 @@ for ii in range(256):
     alpha_temp = -a0*b0*(1+element.s[:,0,0]-element.s[:,1,0])/waveguide.k0
     alpha[:,ii] = alpha_temp/np.amax(np.abs(alpha_temp))
 # set up subplot grid
+
 #%%
+dict_o_ntwks = rf.read_all(set_data_folder, contains = '.s2p')
+
 a0 = 14E-3
 b0 = 0.762E-3
-waveguide = rf.RectangularWaveguide(frequency = dut_corrected.frequency, a = a0, b = b0, ep_r = 3.45, nports =2)
+
+first_ntwk = dict_o_ntwks['trl_corrected_voltage_indx_0']
+waveguide = rf.RectangularWaveguide(frequency = first_ntwk.frequency, 
+                                    a = a0, 
+                                    b = b0, 
+                                    ep_r = 3.45, 
+                                    nports =2,
+                                    )
 left= waveguide.line(5E-3, 'm')
 right = left
-
-dict_o_ntwks = rf.read_all(set_data_folder, contains = 's2p')
-alpha = np.zeros((len(dut_corrected.f), 256), dtype = complex)
+alpha = np.zeros((len(first_ntwk.f), 256), dtype = complex)
 for ii in range(256):
     meas_ntwk =dict_o_ntwks['trl_corrected_voltage_indx_' + str(ii)]
 
-    s11_prime = meas_ntwk.s[:,0,0]/(np.exp(1j*waveguide.k0*1E-2))
+    s11_prime = meas_ntwk.s[:,0,0]/(np.exp(-1j*waveguide.k0*1E-2))
     s21_prime = meas_ntwk.s[:,1,0]/(np.exp(-1j*waveguide.k0*1E-2))                            
-    # alpha_temp = -a0*b0*1j*(1+s11_prime-s21_prime)/waveguide.k0
-    alpha_temp = -1j*(1+s11_prime-s21_prime)/waveguide.k0
-    alpha[:,ii] = alpha_temp/np.amax(np.abs(alpha_temp))
-# set up subplot grid
+    alpha_temp = -a0*b0*1j*(1+s11_prime-s21_prime)/waveguide.k0
+    # alpha_temp = -1j*(1+s11_prime-s21_prime)/waveguide.k0
+    
+    alpha[:,ii] = alpha_temp
+alpha_max = (np.amax(np.abs(alpha), axis =(1)))
+alpha_max = alpha_max[:,np.newaxis]
+
+alpha = alpha/alpha_max
+
 
 #%%
-f_indx = 47
-print(f'freq = {dut_corrected.f[f_indx]}')
-alpha_temp  = alpha[f_indx,:]
+f_indx = 125
+for f_indx in list(range(0,251,10)):
+    print(f'freq = {dut_corrected.f[f_indx]}')
+    alpha_temp  = alpha[f_indx,:]
+    
+    fig = plt.figure(f_indx)
+    
+    gridspec.GridSpec(2,2)
+    plt.subplot2grid((2,2), (0,0))
+    plt.plot(range(256), np.abs(alpha_temp))
+    plt.title('Polarizability Mag (dB)', fontsize = 10)
+    plt.tight_layout()
+    
+    plt.subplot2grid((2,2), (1,0))
+    plt.plot(range(256), np.degrees(np.angle(alpha_temp)))
+    plt.title('Polarizability Phase (deg)',fontsize = 10)
+    plt.ylim(-180,180)
+    plt.tight_layout()
+    
+    plt.subplot2grid((2,2), (0,1), colspan = 1, rowspan = 2)
+    plt.scatter(np.real(alpha_temp), np.imag(alpha_temp))
+    # plt.axis('equal')
+    plt.xlim(-1,1)
+    plt.ylim(-1,1)
+    plt.title('Polarizability Real vs Imaginary ', fontsize = 10)
+    plt.tight_layout()
 
-fig = plt.figure(1)
 
-gridspec.GridSpec(2,2)
-plt.subplot2grid((2,2), (0,0))
-plt.plot(range(256), np.abs(alpha_temp))
-plt.title('Polarizability Mag (dB)', fontsize = 10)
-plt.tight_layout()
-
-plt.subplot2grid((2,2), (1,0))
-plt.plot(range(256), np.degrees(np.angle(alpha_temp)))
-plt.title('Polarizability Phase (deg)',fontsize = 10)
-plt.ylim(-180,180)
-plt.tight_layout()
-
-plt.subplot2grid((2,2), (0,1), colspan = 1, rowspan = 2)
-plt.scatter(np.real(alpha_temp), np.imag(alpha_temp))
-# plt.axis('equal')
-plt.xlim(-1,1)
-plt.ylim(-1,1)
-plt.title('Polarizability Real vs Imaginary ', fontsize = 10)
-plt.tight_layout()
 
 
 #%%

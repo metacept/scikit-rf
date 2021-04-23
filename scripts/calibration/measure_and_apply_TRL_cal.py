@@ -30,7 +30,7 @@ plt.rcParams['axes.prop_cycle'] = cycler(color=['b', 'r', 'g', 'y'])
 
 #%% Measured response from TRL Cal 
 
-cal_folder_name = 'TRL2021-04-19'
+cal_folder_name = 'TRL2021-04-23'
 
 measurement_root_folder = Path('/Users/Zaber/Documents/data/scikit_measurements/')
 meas_folder = measurement_root_folder / cal_folder_name
@@ -103,7 +103,7 @@ trl.run()
 
 f_start = 8E9
 f_stop = 12E9
-f_npoints = int(101)
+f_npoints = int(251)
 
 vna = PNA(address ='TCPIP0::10.236.73.132::inst0::INSTR')
 vna.reset()
@@ -196,6 +196,11 @@ dut_corrected.plot_s_db(ax = ax2)
 
 # save results
 dut_corrected.write_touchstone()
+#%%
+fig, ax = plt.subplots()
+dut_corrected.plot_s_db()
+ax.set_ylim(-1,.1)
+
 
 #%%
 
