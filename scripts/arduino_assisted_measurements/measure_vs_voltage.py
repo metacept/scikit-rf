@@ -239,22 +239,24 @@ with ExitStack() as cm:
         
         dut_corrected.write_touchstone(dut_corrected.name, set_data_folder)
 
-#%%
-a0 = 14E-3
-b0 = 0.762E-3
-waveguide = rf.RectangularWaveguide(frequency = dut_corrected.frequency, a = a0, b = b0, ep_r = 3.45, nports =1)
-left= waveguide.line(5E-3, 'm')
-right = left
+ #%%
+# dict_o_ntwks = rf.read_all(set_data_folder, contains = 's2p')
 
-dict_o_ntwks = rf.read_all(set_data_folder, contains = 's2p')
-alpha = np.zeros((len(dut_corrected.f), 256), dtype = complex)
-for ii in range(256):
-    temp =dict_o_ntwks['trl_corrected_voltage_indx_' + str(ii)]
-    temp.z0 = waveguide.z0
-    element = left.inv ** temp ** right.inv  
-    alpha_temp = -a0*b0*(1+element.s[:,0,0]-element.s[:,1,0])/waveguide.k0
-    alpha[:,ii] = alpha_temp/np.amax(np.abs(alpha_temp))
-# set up subplot grid
+# a0 = 14E-3
+# b0 = 0.762E-3
+
+# waveguide = rf.RectangularWaveguide(frequency = dict_o_ntwks[0].frequency, a = a0, b = b0, ep_r = 3.45, nports =1)
+# left= waveguide.line(5E-3, 'm')
+# right = left
+
+# alpha = np.zeros((len(dut_corrected.f), 256), dtype = complex)
+# for ii in range(256):
+#     temp =dict_o_ntwks['trl_corrected_voltage_indx_' + str(ii)]
+#     temp.z0 = waveguide.z0
+#     element = left.inv ** temp ** right.inv  
+#     alpha_temp = -a0*b0*(1+element.s[:,0,0]-element.s[:,1,0])/waveguide.k0
+#     alpha[:,ii] = alpha_temp/np.amax(np.abs(alpha_temp))
+# # set up subplot grid
 
 #%%
 dict_o_ntwks = rf.read_all(set_data_folder, contains = '.s2p')
@@ -289,8 +291,8 @@ alpha = alpha/alpha_max
 
 #%%
 f_indx = 125
-for f_indx in list(range(0,251,10)):
-    print(f'freq = {dut_corrected.f[f_indx]}')
+for f_indx in list(range(0,251,2)):
+    print(f'freq = {first_ntwk.f[f_indx]}')
     alpha_temp  = alpha[f_indx,:]
     
     fig = plt.figure(f_indx)
@@ -312,9 +314,10 @@ for f_indx in list(range(0,251,10)):
     # plt.axis('equal')
     plt.xlim(-1,1)
     plt.ylim(-1,1)
-    plt.title('Polarizability Real vs Imaginary ', fontsize = 10)
+    plt.title(f'Polarizability Real vs Imaginary, f= {first_ntwk.f[f_indx]/1E9: .2f} GHz', fontsize = 10)
     plt.tight_layout()
-
+    filename = set_data_folder / f'extraceted_alpha__vs_voltage_{f_indx}.png'
+    plt.savefig(filename)
 
 
 

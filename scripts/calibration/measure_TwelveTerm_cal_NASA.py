@@ -14,22 +14,22 @@ rf.stylely()
 # %matplotlib inline
 #sweep values
 
-
+%matplotlib qt5
 #%% build folder for cal data using today's date
 today = date.today()
 date_str = today.strftime("%Y-%m-%d")
 cal_folder_name = date_str + '_SOLT'
 
-root_folder = Path('/Users/Zaber/Documents/data/scikit_measurements/Mike_Metasurface_3')
+root_folder = Path('/Users/Zaber/Documents/data/scikit_measurements/')
 meas_folder = root_folder / cal_folder_name
 
 meas_folder.mkdir(exist_ok = True)
 
 #%%initialize VNA
 
-f_start = 8E9
-f_stop = 12E9
-f_npoints = int(251)
+f_start = 0.5E9
+f_stop = 3E9
+f_npoints = int(201)
 
 vna = PNA(address ='TCPIP0::10.236.73.132::inst0::INSTR')
 vna.reset()
